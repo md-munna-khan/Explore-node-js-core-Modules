@@ -45,3 +45,41 @@ schoolBell.on("broken",()=>{
 schoolBell.emit("ring")
 schoolBell.emit("broken")
 ```
+
+## 13-3 Asynchronous way to read and write files
+- asynchronous readfile 
+ ###### syntax => fs.readFile(path, options, callback);
+![alt text](image.png)
+ 
+```js
+
+const fs = require('fs');
+console.log("task 1")
+
+fs.readFile("./hello.txt",{encoding: "utf-8"},(err,data)=>{
+    if(err){
+        console.log("something went Wrong",err)
+        return;
+    }
+    console.log(data)
+})
+
+console.log("task 2")
+```
+
+```js
+/// write file =============
+
+// Syntax
+// fs.writeFile(file, data, options, callback);
+
+let text="munna vi"
+fs.writeFile("./hello.txt",text,{encoding: "utf-8"},(err)=>{
+    if(err){
+        console.log("something went Wrong",err)
+        return;
+    }
+    console.log( " writing data successfull")
+})
+```
+![alt text](image-1.png)
