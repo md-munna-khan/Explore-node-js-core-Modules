@@ -213,3 +213,22 @@ console.log("📝 Log saved at:", filePath);
 * `path.join(__dirname, "filename")` ensures the correct full path regardless of OS.
 
 
+## 13-6 Creating a todo app with basic http server using nodejs
+
+![alt text](image-4.png)
+when i console req and res and get in postman
+![alt text](image-5.png)
+
+```js
+const http = require("http")
+
+
+const server=http.createServer((req,res)=>{
+    console.log({req,res})
+    res.end("welcome to todo app server")
+})
+
+server.listen(5000,"127.0.0.1",()=>{
+    console.log("server listening to port 5000")
+})
+```
