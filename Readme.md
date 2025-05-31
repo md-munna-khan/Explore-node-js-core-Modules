@@ -83,3 +83,44 @@ fs.writeFile("./hello.txt",text,{encoding: "utf-8"},(err)=>{
 })
 ```
 ![alt text](image-1.png)
+
+## 13-4 Buffer and Streaming
+![alt text](image-2.png)
+
+```js
+const fs = require("fs");
+
+const readStream = fs.createReadStream("./hello.txt", { encoding: "utf-8" });
+const writeStream = fs.createWriteStream("./helloWorld.txt", { encoding: "utf-8" });
+
+// When data is read from the input file
+readStream.on("data", (data) => {
+    console.log(data); // print the chunk
+
+    writeStream.write(data, (err) => {
+        if (err) {
+            throw new Error("Write error: " + err); // ✅ FIXED: correct error handling
+        }
+    });
+});
+
+// Handle reading errors
+readStream.on("error", (err) => {
+    if (err) {
+        throw new Error("Read error: " + err); // ✅ FIXED: correct error handling
+    }
+});
+
+// When reading is finished
+readStream.on("end", () => {
+    console.log("Reading successfully completed");
+    writeStream.end(); // finish the write stream
+});
+
+// When writing is finished
+writeStream.on("finish", () => {
+    console.log("Writing successfully completed");
+});
+```
+## 13-5 Making a basic logger app & Path module
+![alt text](image-3.png)
