@@ -39,30 +39,50 @@
 
 
 
-///============== readfile=============
+///============== readStream=============
+const { error } = require('console');
 const fs = require('fs');
-console.log("task 1")
 
-fs.readFile("./hello.txt",{encoding: "utf-8"},(err,data)=>{
-    if(err){
-        console.log("something went Wrong",err)
-        return;
-    }
+
+// fs.readFile("./hello.txt",{encoding: "utf-8"},(err,data)=>{
+//     if(err){
+//         console.log("something went Wrong",err)
+//         return;
+//     }
+//   fs.writeFile("./helloWorld.txt",data,{encoding: "utf-8"},(err)=>{
+//     if(err){
+//         console.log("something went Wrong",err)
+//         return;
+//     }
+//     console.log( " writing data successfull")
+// })
+// })
+
+const readStream =fs.createReadStream("./hello.txt",{encoding:"utf-8"});
+const writeStream =fs.createWriteStream("./helloWorld.txt",{encoding:"utf-8"});
+
+readStream.on("data",(data)=>{
     console.log(data)
+
+    writeStream.write(data,(err)=>{
+       if(err){
+         throw error ("error",err)
+       }
+    })
+});
+
+// error handel
+readStream.on("error",(err)=>{
+  if(err){
+         throw error ("error",err)
+       }
 })
 
-console.log("task 2")
-
-/// write file =============
-
-// Syntax
-// fs.writeFile(file, data, options, callback);
-
-let text="munna vi"
-fs.writeFile("./hello.txt",text,{encoding: "utf-8"},(err)=>{
-    if(err){
-        console.log("something went Wrong",err)
-        return;
-    }
-    console.log( " writing data successfull")
+readStream.on("end" ,()=>{
+    console.log("reading succesfully");
+    writeStream.end()
+})
+writeStream.on("finish" ,()=>{
+    console.log("writing succesfully");
+    writeStream.end()
 })

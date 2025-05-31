@@ -83,3 +83,179 @@ fs.writeFile("./hello.txt",text,{encoding: "utf-8"},(err)=>{
 })
 ```
 ![alt text](image-1.png)
+
+## 13-4 Buffer and Streaming
+![alt text](image-2.png)
+
+```js
+const fs = require("fs");
+
+const readStream = fs.createReadStream("./hello.txt", { encoding: "utf-8" });
+const writeStream = fs.createWriteStream("./helloWorld.txt", { encoding: "utf-8" });
+
+// When data is read from the input file
+readStream.on("data", (data) => {
+    console.log(data); // print the chunk
+
+    writeStream.write(data, (err) => {
+        if (err) {
+            throw new Error("Write error: " + err); // ✅ FIXED: correct error handling
+        }
+    });
+});
+
+// Handle reading errors
+readStream.on("error", (err) => {
+    if (err) {
+        throw new Error("Read error: " + err); // ✅ FIXED: correct error handling
+    }
+});
+
+// When reading is finished
+readStream.on("end", () => {
+    console.log("Reading successfully completed");
+    writeStream.end(); // finish the write stream
+});
+
+// When writing is finished
+writeStream.on("finish", () => {
+    console.log("Writing successfully completed");
+});
+```
+## 13-5 Making a basic logger app & Path module
+![alt text](image-3.png)
+# 📘 13-5: Making a Basic Logger App & Path Module
+
+A basic Node.js CLI logger app that writes user messages with timestamps into a `log.txt` file using the `fs` and `path` modules.
+
+---
+
+## 🚀 Features
+
+* Accept user-defined message from the terminal.
+* Append message along with timestamp into a log file.
+* Automatically creates the log file if it doesn’t exist.
+* Uses Node.js built-in modules: `fs`, `path`, and `process`.
+
+---
+
+## 📁 Folder Structure
+
+```
+log-app/
+│
+├── log.js          # Main logger script
+└── log.txt         # Output log file
+```
+
+---
+
+## 🧑‍💻 How to Use
+
+### 1. Open your terminal.
+
+### 2. Run the following command:
+
+```bash
+node log.js "Your message goes here"
+```
+
+✅ Example:
+
+```bash
+node log.js "Server started"
+```
+
+---
+
+## 📄 Sample Output in `log.txt`
+
+```
+Server started Sat May 31 2025 16:00:12 GMT+0600 (Bangladesh Standard Time)
+```
+
+---
+
+## ⚙️ Code Explanation
+
+```js
+const path = require("path");
+const fs = require("fs");
+
+// Get arguments from terminal input
+const inputArguments = process.argv.slice(2);
+const text = inputArguments.join(" ");
+const timestamp = new Date();
+const message = `${text} ${timestamp} \n`;
+
+// Input validation
+if (!message) {
+    console.log("Please provide a message to log");
+    process.exit(1);
+}
+
+// Set the path to the log file
+const filePath = path.join(__dirname, "log.txt");
+
+// Append log message to the file
+fs.appendFile(filePath, message, { encoding: "utf-8" }, () => {
+    console.log("✅ Log added successfully");
+});
+
+console.log("📝 Log saved at:", filePath);
+```
+
+---
+
+## 💡 Why Use `path` Module?
+
+* To create a consistent file path across different operating systems.
+* `path.join(__dirname, "filename")` ensures the correct full path regardless of OS.
+
+
+## 13-6 Creating a todo app with basic http server using nodejs
+
+![alt text](image-4.png)
+when i console req and res and get in postman
+![alt text](image-5.png)
+
+```js
+const http = require("http")
+
+
+const server=http.createServer((req,res)=>{
+    console.log({req,res})
+    res.end("welcome to todo app server")
+})
+
+server.listen(5000,"127.0.0.1",()=>{
+    console.log("server listening to port 5000")
+})
+```
+
+## 13-7 Routing in node js
+
+```js
+const http = require("http")
+
+
+const server=http.createServer((req,res)=>{
+   if(req.url === "/todos" && req.method ==="GET"){
+    res.end("ALL Todos")
+   }else if(req.url === "/todos/create-todo" && req.method ==="POST"){
+    res.end("Todo Created")
+   } else{
+    res.end("404")
+   }
+})
+
+server.listen(5000,"127.0.0.1",()=>{
+    console.log("server listening to port 5000")
+})
+/**\
+ * /todos Get -all todo
+ * 
+ * /todos /create todos post create
+ */
+```
+![alt text](image-6.png)
