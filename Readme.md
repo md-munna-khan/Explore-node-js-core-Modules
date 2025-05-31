@@ -124,3 +124,92 @@ writeStream.on("finish", () => {
 ```
 ## 13-5 Making a basic logger app & Path module
 ![alt text](image-3.png)
+# 📘 13-5: Making a Basic Logger App & Path Module
+
+A basic Node.js CLI logger app that writes user messages with timestamps into a `log.txt` file using the `fs` and `path` modules.
+
+---
+
+## 🚀 Features
+
+* Accept user-defined message from the terminal.
+* Append message along with timestamp into a log file.
+* Automatically creates the log file if it doesn’t exist.
+* Uses Node.js built-in modules: `fs`, `path`, and `process`.
+
+---
+
+## 📁 Folder Structure
+
+```
+log-app/
+│
+├── log.js          # Main logger script
+└── log.txt         # Output log file
+```
+
+---
+
+## 🧑‍💻 How to Use
+
+### 1. Open your terminal.
+
+### 2. Run the following command:
+
+```bash
+node log.js "Your message goes here"
+```
+
+✅ Example:
+
+```bash
+node log.js "Server started"
+```
+
+---
+
+## 📄 Sample Output in `log.txt`
+
+```
+Server started Sat May 31 2025 16:00:12 GMT+0600 (Bangladesh Standard Time)
+```
+
+---
+
+## ⚙️ Code Explanation
+
+```js
+const path = require("path");
+const fs = require("fs");
+
+// Get arguments from terminal input
+const inputArguments = process.argv.slice(2);
+const text = inputArguments.join(" ");
+const timestamp = new Date();
+const message = `${text} ${timestamp} \n`;
+
+// Input validation
+if (!message) {
+    console.log("Please provide a message to log");
+    process.exit(1);
+}
+
+// Set the path to the log file
+const filePath = path.join(__dirname, "log.txt");
+
+// Append log message to the file
+fs.appendFile(filePath, message, { encoding: "utf-8" }, () => {
+    console.log("✅ Log added successfully");
+});
+
+console.log("📝 Log saved at:", filePath);
+```
+
+---
+
+## 💡 Why Use `path` Module?
+
+* To create a consistent file path across different operating systems.
+* `path.join(__dirname, "filename")` ensures the correct full path regardless of OS.
+
+
