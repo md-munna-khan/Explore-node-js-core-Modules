@@ -1,46 +1,82 @@
 const http = require("http");
+const path = require("path");
+const filePath = path.join(__dirname, "./db/todo.json");
+const fs = require("fs");
 const { json } = require("stream/consumers");
-const data=[
-  {
-    "id": 1,
-    "name": "Munna Khan",
-    "email": "mk8761174@gmail.com",
-    "role": "Worker",
-    "coins": 1300
-  },
-  {
-    "id": 2,
-    "name": "Ayesha Rahman",
-    "email": "ayesha@example.com",
-    "role": "Buyer",
-    "coins": 800
-  },
-  {
-    "id": 3,
-    "name": "Tanvir Hasan",
-    "email": "tanvir@example.com",
-    "role": "Admin",
-    "coins": 5000
-  }
-]
 
+// Get All todos
 const server = http.createServer((req, res) => {
-  if (req.url === "/todos" && req.method === "GET") {
-    // first way====
+  const url = new URL(req.url, `http://${req.headers.host}`);
+  const pathname = url.pathname;
+
+  if (pathname === "/todos" && req.method === "GET") {
+    const data = fs.readFileSync(filePath, { encoding: "utf-8" });
     res.writeHead(200, {
-      "content-type": "text/html",
-    //   "email":"ph@gmail.com"
+      "content-type": "application/json",
     });
-    //========================
-    // second way
-    // res.setHeader("content-type","text/plain")
-    // res.setHeader("email","ph2@gmail.com")
-    // res.statusCode=201
-    res.end(`<h1>hello world</h1> <h2>hello world</h2>`);
-  } else if (req.url === "/todos/create-todo" && req.method === "POST") {
-    res.end("Todo Created");
-  } else {
-    res.end("404");
+
+    res.end(data);
+  }
+  // post todos
+  else if (pathname === "/todos/create-todo" && req.method === "POST") {
+    let data = "";
+    req.on("data", (chunk) => {
+      data = data + chunk;
+    });
+
+    req.on("end", () => {
+      const { name, email } = JSON.parse(data);
+      console.log(data);
+      console.log(name, email);
+      const createdAt = new Date().toLocaleString();
+      const allTodos = fs.readFileSync(filePath, { encoding: "utf-8" });
+      const parseAllTodos = JSON.parse(allTodos);
+      console.log(parseAllTodos);
+      parseAllTodos.push({ name, email, createdAt });
+      fs.writeFileSync(filePath, JSON.stringify(parseAllTodos, null, 2), {
+        encoding: "utf-8",
+      });
+      res.end(JSON.stringify(name, email, createdAt, null, 2));
+    });
+    // const allTodos=fs.writeFileSync(filePath,{encoding:"utf-8"});
+  }
+  // single todo
+  else if (pathname === "/todo" && req.method === "GET") {
+    const name = url.searchParams.get("name");
+    const data = fs.readFileSync(filePath, { encoding: "utf-8" });
+    const parsedData = JSON.parse(data);
+    const todo = parsedData.find((todo) => todo.name === name);
+    const stringifiedTodo = JSON.stringify(todo);
+    res.writeHead(200, {
+      "content-type": "application/json",
+    });
+
+    res.end(stringifiedTodo);
+  }
+  // update todo
+  else if (pathname === "/todos/update-todo" && req.method === "PATCH") {
+      const name = url.searchParams.get("name");
+    let data = "";
+    req.on("data", (chunk) => {
+      data = data + chunk;
+    });
+
+    req.on("end", () => {
+      const {  email } = JSON.parse(data);
+    
+     
+      const allTodos = fs.readFileSync(filePath, { encoding: "utf-8" });
+      const parseAllTodos = JSON.parse(allTodos);
+      
+      const todoIndex=parseAllTodos.findIndex((todo)=>todo.name ===name)
+
+      parseAllTodos[todoIndex].email=email      
+      fs.writeFileSync(filePath, JSON.stringify(parseAllTodos, null, 2), {
+        encoding: "utf-8",
+      });
+      res.end(JSON.stringify({name, email, createdAt:parseAllTodos[todoIndex].createdAt}, null, 2));
+    });
+    // const allTodos=fs.writeFileSync(filePath,{encoding:"utf-8"});
   }
 });
 
