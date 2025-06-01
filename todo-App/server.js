@@ -2,11 +2,15 @@ const http = require("http");
 const path=require ("path")
 const filePath=path.join(__dirname, "./db/todo.json")
 const fs = require("fs");
+const { json } = require("stream/consumers");
 
 
 // Get All todos
 const server = http.createServer((req, res) => {
-  if (req.url === "/todos" && req.method === "GET") {
+const url = new URL(req.url,`http://${req.headers.host}`);
+const pathname=url.pathname
+
+  if ( pathname === "/todos" && req.method === "GET") {
     const data = fs.readFileSync(filePath,{encoding:"utf-8"})
     res.writeHead(200, {
       "content-type": "application/json",
@@ -16,7 +20,7 @@ const server = http.createServer((req, res) => {
     res.end(data);
   }
   // post todos
-  else if (req.url === "/todos/create-todo" && req.method === "POST") {
+  else if ( pathname=== "/todos/create-todo" && req.method === "POST") {
 let data = ""
 req.on("data",(chunk)=>{
     data = data + chunk
@@ -37,8 +41,22 @@ req.on("end",()=>{
 })
 // const allTodos=fs.writeFileSync(filePath,{encoding:"utf-8"});
     
-  } else {
-    res.end("404");
+  }
+  // single todo
+  else   if ( pathname ==="/todo" && req.method === "GET") {
+  const name = url.searchParams.get("name")
+ const data = fs.readFileSync(filePath,{encoding:"utf-8"})
+ const parsedData=JSON.parse(data)
+ const todo = parsedData.find((todo)=> todo.name===name)
+ const stringifiedTodo=JSON.stringify(todo)
+    res.writeHead(200, {
+      "content-type": "application/json",
+  
+    });
+  
+    res.end(stringifiedTodo);
+  
+
   }
 });
 
